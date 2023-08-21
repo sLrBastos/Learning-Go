@@ -1,10 +1,5 @@
 package main
 
-import (
-	"deez/even"
-	"fmt"
-)
-
 // func main() {
 
 // GOTO
@@ -782,7 +777,7 @@ import (
 
 // CHAPTER 4 - PACKAGES
 
-func main() {
-	i := 5
-	fmt.Printf("Is %d even ? %v\n", i, even.Even(i))
-}
+// func main() {
+// 	i := 5
+// 	fmt.Printf("Is %d even ? %v\n", i, even.Even(i))
+// }
