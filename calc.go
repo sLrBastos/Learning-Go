@@ -41,7 +41,7 @@ func ReversePolish(expression string) (int, string) {
 		} else {
 			operand, err := strconv.Atoi((token))
 			if err != nil {
-				return 0, fmt.Sprint("Error parsing operand: %s\n", err)
+				return 0, fmt.Sprint("Error parsing operand: ", err)
 			}
 			stack.Push(operand)
 		}
