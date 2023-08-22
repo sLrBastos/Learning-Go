@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 // func main() {
 
 // GOTO
@@ -657,6 +661,8 @@ package main
 // 	fmt.Printf("Max is %d\n", maximum(2, 4, 6, 10, 21, 7, 23))
 // }
 
+// 8.
+
 // MAP FUNCTION - BASICALLY HAVE A FUNCTION THAT TAKES a fUNCTION AND A SLICE AS AN ARGUMENT AND RETURN A slICE. YOU LOOP THROUGH THE SLICE AND APPLY THAT FUNCTION:
 // IN THIS CASE  IT SQUARES THE ELEMENT, TO EACH ELEMENT OF THE SLICE
 
@@ -676,6 +682,7 @@ package main
 // 	fmt.Printf("%v", (Map(f, m)))
 // }
 
+// 9.
 // STACK - * is a pointer
 
 // type stack struct {
@@ -781,3 +788,346 @@ package main
 // 	i := 5
 // 	fmt.Printf("Is %d even ? %v\n", i, even.Even(i))
 // }
+
+// CHAPTER 5. BEYOND THE BASICS
+
+// POINTERS
+
+// var p *int
+
+// func main() {
+
+// 	fmt.Printf("%v\n", p)
+// 	var i int
+// 	p = &i
+// 	fmt.Printf("%v", p)
+// }
+
+// ALLOCATION - NEW AND MAKE - MAKE ONLY APPLIES TO MAPS, SLICES AND CHANNELS. DOES NOT RETURN A POINTER.
+// TO OBTAIN AN EXPLICIT POINT ALLOCATE WITH NEW
+// NEW ALLOCATES, MAKE INITIALIZES
+
+// - NEW(T) RETURNS *T POINTING TO A ZEROED T
+// - MAKE(T) RETURNS AND INITIALIZED T
+
+// var p *[]int = new([]int)
+// var v []int = make([]int, 100)
+
+// var p *[]int = new([]int) // COMPLEX FOR THE SAEK OF COMPLEXITY. NEXT SYNTAX IS UST BETTER AND SIMPLER
+// *p = make([]int, 100, 100) // CREATES AND ARRAY WITH 100 INTS. THEN CREATES A SLICE WITH LENGTH 10, CAPACITY 100. POINTING AT THE FIRST 10 ELEMENTS OF THE ARRAY
+
+// v := make([]int, 100) // NEW SLICE OF 100 INTS
+
+// CONSTRUCTORS AND COMPOSITE LITERALS
+
+// func NewFile(fd int, name string) *File {
+// 	if fd < 0 {
+// 		return nil
+// 	}
+// 	f := new(File)
+// 	f.fd = fd
+// 	f.name = name
+// 	f.dirinfo = nil
+// 	f.nepipe = 0
+// 	return f
+// }
+
+// ALOT OF BOILER PLATE. IT CAN bE SIMPLIFIED USING A COMPOSITE LITERAL. IT CREATES A NEW INSTANCE EACH TIME IT IS EVALUATED
+
+// func NewFile(fd int, name string) *File {
+// 	if fd < 0 {
+// 		return nil
+// 	}
+// 	return &File{fd, name, nil, 0} // THE ITEMS CALLED FIELDS, MUST BE LAID OUT IN ORDER AND ALL BE PRESENT
+
+// 	// HOWEVER, IF WE USE FIELDS:VALUE PAIRS, INITIALIZERS CAN APPEAR IN ANY ORDER, AND MISSING ONES SIMPLY GET THEIR VALUE AS ZEROo
+// 	return &File{fd; fd, name: name}
+// }
+
+// COMPOSITE LITERALS CAN ALSO BE USE FOR ARRAYS, MAPS, SLICES. FIELDS LABELS ARE INDICES OR MAP KEYS.
+
+// ar := [...]string{Enone: "no error", Einval: "invalid argument"}
+// sl := []string {Enone: "no error", Einval: "invalid argument"}
+// ma .= map[int]string{Enone: "no error", Einval: "invalid argument"}
+
+//-----------------------------------------------------------------
+
+// DEFINING YOUR OWN TYPES - TYPE KEYWORD
+
+// FOR INSTANCE, type foo int , CREATES A NEW TPYE NAMED FOO WHICH ACTS LIKE AN INT
+// MORE COMPLEX/SophisTICATED TYPES IS DONE WITH STRUCT KEYWORD
+
+// type NameAge struct {
+// 	name string
+// 	age  int
+// }
+
+// func main() {
+// 	a := new(NameAge)
+// 	a.name = "Pete"
+// 	a.age = 42
+// 	fmt.Printf("%v\n", a)
+// 	fmt.Printf("%s\n", a.name)
+// 	fmt.Printf("%d\n", a.age)
+// }
+
+// EACH ITEM IN A STRUCT IS CALLED A FILED
+
+// struct {
+// 	x,y int
+// 	A *[]int
+// 	F func()
+// }
+
+// IF YOU OMIT THE NAME, YOU CREATE AND ANONYMOUS FIELD
+// FIELDS THAT START WITH A CAPITAL LETTER ARE EXPORTED ( CAN BE READ FROM OTHER PACKAGES, JUST LIKE FUNCTIONS DEFINED IN PACKAGES)
+// WHILE LOWER CASE ARE PRIVATE
+
+// METHODS
+
+//1. FUNCTION THAT TAKES THE TYPE YOU CREATED AS AN ARGUMENT
+
+// func doSomething(n1 *NameAge, n2 int) {}
+
+//2. WORKS ON THE TYPE
+
+// func (n1 *NameAge) doSomething(n2 int) {}
+
+// METHOD CALL
+
+// var n *NameAge
+// n.doSomething(2)
+
+// There is a subtle but major difference between the following type declarations.
+
+// type Mutex struct{}
+
+// func (m *Mutex) Lock()   {}
+// func (m *Mutex) Unlock() {}
+
+// type NewMutex Mutex
+// type PrintableMutex struct{ Mutex }
+
+//NEWMUTEX IS EQUAL TO MUTEX BUT DOES NOT HAVE ITS METHODS ( LOCK AND UNLOCK)
+// ON THE OTHER HAND, PRINTABLEMUTEX HAS INHERITED THE METHODS FROM MUTEX
+
+// -------------------------------------------------------
+
+// CONVERSIONS - CONVERTING A TYPE TO ANOTHER
+
+// NOT EVERY CONVERSION IS ALLOWED
+
+// From	| b []byte  |	i []int	| r []rune  |	s string |	f float32 | i int
+// To      |           |           |           |            |            |
+// ________|___________|___________|___________|____________|____________|_______________
+// []byte	|   ·		| []byte(s)	|	        |            |            |
+// ________|___________|___________|___________|____________|____________|__________
+// []int	|	·		| []int(s)	|	        |            |            |
+// ________|___________|___________|___________|____________|____________|___________
+// []rune	|			| []rune(s)	|	        |            |            |
+// ________|___________|___________|___________|____________|____________|___________
+// string	| string(b)	| string(i)	|string(r)  |	  ·	     |	          |
+// ________|___________|___________|___________|____________|____________|___________
+// float32	|			|	·	    |float32(i) |            |            |
+// ________|___________|___________|___________|____________|____________|__________
+// int		|			| int(f)	|   ·       |            |            |
+
+// TABLE OF VALID CONVERSIONS. FLOAT64 WORKS SAME AS FLOAT32
+
+// FROM STRING TO A SLICE OF BYTES
+
+// func main() {
+// 	// mystring := "hello this is string"
+// 	// byteslice := []byte(mystring)
+
+// 	// // STRING TO SLICE OF RUNES
+
+// 	// runeslice := []rune(mystring)
+
+// 	// // STRINGS IN GO ARE ENCODED IN UTF-8. SOME CHARACTERS IN THE MAY END UP in 1,2 ,3 or 4 bytes
+// 	// fmt.Printf("Beans: %d\n", byteslice)
+
+// 	// // EACH RUNE CONTAINS A UNICODE CODE POINT.
+// 	// // EVERY CHRACTER CORRESPONDS TO ONE RUNE
+
+// 	// fmt.Printf("RUNEBEANS: %d", runeslice)
+
+// 	// FROM A SLICE OF BYTES TO A STRING
+
+// 	b := []byte{'h', 'e', 'l', 'l', 'o'} // COMPOSITE LITERAL
+// 	s := string(b)
+// 	fmt.Printf("BYTETOSTRING: %s\n", s)
+
+// 	i := []rune{257, 1024, 65}
+// 	r := string(i)
+// 	fmt.Printf("RUNESTOSTRING: %s\n", r)
+// }
+
+// FOR NUMERICS VALUES THE FOLLOWING CONVERSIONS ARE DEFINED
+// Convert to an integer with a specific (bit) length: uint8(int)
+//From floating point to an integer value: int(float32). This discards the fraction part from the floating point value.
+//And the other way around: float32(int).
+
+// USER DEFINED TYPES AND CONVERSIONS - HOW TO CONVERT BETWEEN TYPES YOU HAVE DEFINED YOURSELF
+
+// type foo struct{ int } // ANONYMOUS STRUCT FIELD
+// type bar foo           // BAR IS AN ALIAS OF FOO
+
+// var b bar = bar{1} // DECLARE B TO BE A BAR
+// var f foo = foo(b) // ASSIGN B TO F
+
+// ---------------------------------------
+
+// EXERCISES
+
+// 1. MAP FUNCTION WITH INTERFACES
+
+// BEFORE INTERFACE
+
+// func Map(f func(int) int, l []int) []int {
+// 	j := make([]int, len(l))
+// 	for k, v := range l {
+// 		j[k] = f(v)
+// 	}
+// 	return j
+// }
+
+// func main() {
+// 	m := []int{1, 3, 4}
+// 	f := func(i int) int {
+// 		return i * i
+// 	}
+// 	fmt.Printf("%v", (Map(f, m)))
+// }
+
+// WITH INTERFACE - WORKING WITH INT AND STRING
+
+type beans interface{}
+
+// func beanDealer(input beans) beans {
+
+// 	switch input.(type) {
+// 	case int:
+// 		return input.(int) * input.(int)
+// 	case string:
+// 		return input.(string) + input.(string) + input.(string) + input.(string)
+// 	}
+// 	return input
+// }
+
+// func Map(f func(beans) beans, l []beans) []beans {
+// 	j := make([]beans, len(l))
+// 	for k, v := range l {
+// 		j[k] = f(v)
+// 	}
+// 	return j
+// }
+
+// func main() {
+// 	m := []beans{1, 3, 4}
+// 	s := []beans{"a", "b", "c", "d"}
+
+// 	mf := Map(beanDealer, m)
+// 	sf := Map(beanDealer, s)
+
+// 	fmt.Printf("%v\n", mf)
+// 	fmt.Printf("%v\n", sf)
+// }
+
+// POINTERS
+
+// type Person struct {
+// 	name string
+// 	age  int
+// }
+
+// 1.WHAT IS THE DIFFERENCE BETWEEN THE 2 LINES
+
+// var p1 Person
+// p2 := new(Person)
+
+// ANSWER:
+// FIRST ONE ASSIGNS THE TYPE PERSON TO P1. THE TYPE OF P1 IS PERSON.
+// SECOND ONE ALLOCATES MEMORY AND ASSINGS A POINTER TO P2. THE TYPE OF P2 IS *PERSON
+
+// 2. WHAT IS THE DIFFERENCE BETWEEN TEH FOLLOWING TWO ALLOCATIONS
+
+// func set(t *T) {
+// 	x = t
+// }
+
+// func Set(t T) {
+// 	x = &t
+// }
+
+//ANSWER:
+// FIRST FUNTION, X POINTS TO THE SAME THING T DOES. WHICH IS THE SAME THING THE ARGUMENT POINTS TO.
+// SECOND FUNCTION, X POINTS TO A NEW(HEAP-ALLOCATED) VARiABLE T WHICH CONTAINS A COPY OF WHATEVER THE ARGUMENT VALUE IS
+
+// LINKED LIST - DOUBLY
+// 1. USING CONTAINER/LIST PACkAGE
+
+// func main() {
+// 	l := list.New()
+// 	l.PushBack(1)
+// 	l.PushBack(2)
+// 	l.PushBack(4)
+
+// 	for e := l.Front(); e != nil; e = e.Next() {
+// 		fmt.Printf("%v\n", e.Value)
+// 	}
+
+// }
+
+// 2. DOUBLY LINKED LIST - RAW - NO pACKAGES
+
+type Node struct {
+	prev  *Node
+	next  *Node
+	value interface{}
+}
+
+type DoublyLinkedList struct {
+	head *Node
+	tail *Node
+}
+
+// PUSHBACK ADDS A NEW NODe WITH GIVEN VALUE TO THE END OF HTE LIST
+func (list *DoublyLinkedList) PushBack(value interface{}) {
+	newNode := &Node{
+		prev:  list.tail,
+		next:  nil,
+		value: value,
+	}
+
+	if list.head == nil {
+		list.head = newNode
+	} else {
+		list.tail.next = newNode
+	}
+
+	list.tail = newNode
+}
+
+// PRINT THE CONTENTS OF THE LSIT
+
+func (list *DoublyLinkedList) Print() {
+	fmt.Println("Doubly Linked list:")
+	current := list.head
+	for current != nil {
+		fmt.Println(current.value)
+		current = current.next
+	}
+}
+
+func main() {
+	// CREATE NEW DOUBLY LINKED LSIT
+	l := DoublyLinkedList{}
+
+	// PUSH VALUES INTO THE LSIT
+	l.PushBack(1)
+	l.PushBack(2)
+	l.PushBack(4)
+
+	l.Print()
+}
