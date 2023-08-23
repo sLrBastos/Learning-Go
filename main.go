@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
+	"io"
+	"os"
 )
 
 // func main() {
@@ -1081,53 +1085,88 @@ type beans interface{}
 
 // 2. DOUBLY LINKED LIST - RAW - NO pACKAGES
 
-type Node struct {
-	prev  *Node
-	next  *Node
-	value interface{}
-}
+// type Node struct {
+// 	prev  *Node
+// 	next  *Node
+// 	value interface{}
+// }
 
-type DoublyLinkedList struct {
-	head *Node
-	tail *Node
-}
+// type DoublyLinkedList struct {
+// 	head *Node
+// 	tail *Node
+// }
 
-// PUSHBACK ADDS A NEW NODe WITH GIVEN VALUE TO THE END OF HTE LIST
-func (list *DoublyLinkedList) PushBack(value interface{}) {
-	newNode := &Node{
-		prev:  list.tail,
-		next:  nil,
-		value: value,
+// // PUSHBACK ADDS A NEW NODe WITH GIVEN VALUE TO THE END OF HTE LIST
+// func (list *DoublyLinkedList) PushBack(value interface{}) {
+// 	newNode := &Node{
+// 		prev:  list.tail,
+// 		next:  nil,
+// 		value: value,
+// 	}
+
+// 	if list.head == nil {
+// 		list.head = newNode
+// 	} else {
+// 		list.tail.next = newNode
+// 	}
+
+// 	list.tail = newNode
+// }
+
+// // PRINT THE CONTENTS OF THE LSIT
+
+// func (list *DoublyLinkedList) Print() {
+// 	fmt.Println("Doubly Linked list:")
+// 	current := list.head
+// 	for current != nil {
+// 		fmt.Println(current.value)
+// 		current = current.next
+// 	}
+// }
+
+// func main() {
+// 	// CREATE NEW DOUBLY LINKED LSIT
+// 	l := DoublyLinkedList{}
+
+// 	// PUSH VALUES INTO THE LSIT
+// 	l.PushBack(1)
+// 	l.PushBack(2)
+// 	l.PushBack(4)
+
+// 	l.Print()
+// }
+
+var numberFlag = flag.Bool("n", false, "number each line") // <<2>>
+
+func cat(r *bufio.Reader) {
+	i := 1
+	for {
+		buf, e := r.ReadBytes('\n')
+		if e == io.EOF {
+			break
+		}
+		if *numberFlag {
+			fmt.Fprintf(os.Stdout, "%5d  %s", i, buf)
+			i++
+		} else {
+			fmt.Fprintf(os.Stdout, "%s", buf)
+		}
 	}
-
-	if list.head == nil {
-		list.head = newNode
-	} else {
-		list.tail.next = newNode
-	}
-
-	list.tail = newNode
-}
-
-// PRINT THE CONTENTS OF THE LSIT
-
-func (list *DoublyLinkedList) Print() {
-	fmt.Println("Doubly Linked list:")
-	current := list.head
-	for current != nil {
-		fmt.Println(current.value)
-		current = current.next
-	}
+	return
 }
 
 func main() {
-	// CREATE NEW DOUBLY LINKED LSIT
-	l := DoublyLinkedList{}
-
-	// PUSH VALUES INTO THE LSIT
-	l.PushBack(1)
-	l.PushBack(2)
-	l.PushBack(4)
-
-	l.Print()
+	flag.Parse()
+	if flag.NArg() == 0 {
+		cat(bufio.NewReader(os.Stdin))
+	}
+	for i := 0; i < flag.NArg(); i++ {
+		f, e := os.Open(flag.Arg(i))
+		if e != nil {
+			fmt.Fprintf(os.Stderr, "%s: error reading from %s: %s\n",
+				os.Args[0], flag.Arg(i), e.Error())
+			continue
+		}
+		cat(bufio.NewReader(f))
+	}
 }
